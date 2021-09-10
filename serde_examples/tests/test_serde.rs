@@ -11,12 +11,16 @@ fn test_json() {
     pub enum InteractiveStyle {
         None,
         Camera(Distance),
+        Origin,
     }
 
     let interactive_style = InteractiveStyle::None;
     println!("{:?}", serde_json::to_string(&interactive_style).unwrap());
 
     let interactive_style = InteractiveStyle::Camera(Distance { distance: 11 });
+    println!("{:?}", serde_json::to_string(&interactive_style).unwrap());
+
+    let interactive_style = InteractiveStyle::Origin;
     println!("{:?}", serde_json::to_string(&interactive_style).unwrap());
 
     let c = '1';
@@ -59,4 +63,25 @@ fn test_toml() {
     println!("recipe_toml(fails) = {}", recipe_toml.to_string());
 
     // println!("{:?}", toml::to_string(&c).unwrap());
+}
+
+#[test]
+fn test_bytes() {
+    let device = Device::new();
+    // let v = serde_bytes::serialize(&device, serde_bytes::Serialize);
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+struct Device {
+    ip: String,
+    port: u16,
+}
+
+impl Device {
+    fn new() -> Self {
+        Self {
+            ip: "127.0.0.1".into(),
+            port: 12345,
+        }
+    }
 }
