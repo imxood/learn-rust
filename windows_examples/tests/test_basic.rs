@@ -17,6 +17,9 @@ fn test_message_box() -> windows::Result<()> {
 
 #[test]
 fn test_power() {
+
+    // 参考: https://stackoverflow.com/questions/11394625/powerregistersuspendresumenotification-provided-callback-function-doesnt-work
+
     use std::time::Duration;
 
     unsafe extern "system" fn power_callback(
@@ -37,7 +40,7 @@ fn test_power() {
     unsafe {
         PowerRegisterSuspendResumeNotification(
             DEVICE_NOTIFY_CALLBACK.0,
-            params,
+            &params,
             &mut handle.0 as *mut c_void as *mut *mut c_void,
         );
     }
