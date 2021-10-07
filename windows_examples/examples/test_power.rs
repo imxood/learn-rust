@@ -1,7 +1,4 @@
-use bindings::Windows::Win32::Foundation::HANDLE;
-use bindings::Windows::Win32::System::Power::PowerRegisterSuspendResumeNotification;
 use bindings::Windows::Win32::System::Power::DEVICE_NOTIFY_CALLBACK;
-use bindings::Windows::Win32::System::Power::HPOWERNOTIFY;
 use bindings::Windows::Win32::System::Power::PDEVICE_NOTIFY_CALLBACK_ROUTINE;
 use bindings::Windows::Win32::UI::WindowsAndMessaging::PBT_APMRESUMEAUTOMATIC;
 use bindings::Windows::Win32::UI::WindowsAndMessaging::PBT_APMRESUMESUSPEND;
@@ -9,21 +6,9 @@ use bindings::Windows::Win32::UI::WindowsAndMessaging::PBT_APMSUSPEND;
 use std::ffi::c_void;
 use std::ptr::null_mut;
 
-#[test]
-fn test_message_box() -> windows::Result<()> {
-    use bindings::Windows::Win32::UI::WindowsAndMessaging::*;
-    unsafe {
-        MessageBoxA(None, "Text", "Caption", MB_OK);
-    }
-    Ok(())
-}
-
-#[test]
-fn test_power() {
+fn main() {
     // 参考: https://stackoverflow.com/questions/11394625/powerregistersuspendresumenotification-provided-callback-function-doesnt-work
     // 电源管理事件: https://docs.microsoft.com/en-us/windows/win32/power/power-management-events
-
-    use std::time::Duration;
 
     unsafe extern "system" fn power_callback(
         _context: *mut c_void,
@@ -47,25 +32,33 @@ fn test_power() {
         0
     }
 
+    #[repr(C)]
     pub struct DeviceNotifySubscribeParameters {
         pub callback: PDEVICE_NOTIFY_CALLBACK_ROUTINE,
         pub context: *mut ::std::ffi::c_void,
     }
-
-    let mut params = DeviceNotifySubscribeParameters {
+    let mut recipient = DeviceNotifySubscribeParameters {
         callback: power_callback,
         context: null_mut(),
     };
 
-    let mut handle = HPOWERNOTIFY::default();
+    let mut registrationhandle = null_mut();
     let ret = unsafe {
-        let params =
-            &mut params as *mut DeviceNotifySubscribeParameters as *mut c_void as *mut HANDLE;
-        let params = *params;
+        let recipient = &mut recipient as *mut DeviceNotifySubscribeParameters as *mut c_void;
+
+        #[link(name = "POWRPROF")]
+        extern "system" {
+            fn PowerRegisterSuspendResumeNotification(
+                flags: u32,
+                recipient: *mut c_void,
+                registrationhandle: *mut *mut c_void,
+            ) -> u32;
+        }
+
         PowerRegisterSuspendResumeNotification(
             DEVICE_NOTIFY_CALLBACK.0,
-            params,
-            &mut handle as *mut HPOWERNOTIFY as *mut *mut c_void,
+            recipient,
+            &mut registrationhandle as *mut *mut c_void,
         )
     };
 
@@ -75,6 +68,6 @@ fn test_power() {
     }
 
     loop {
-        std::thread::sleep(Duration::from_secs(1));
+        std::thread::sleep(std::time::Duration::from_secs(1));
     }
 }
