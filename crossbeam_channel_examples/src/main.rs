@@ -1,16 +1,12 @@
-use crossbeam_channel::{select, unbounded};
+use std::time::Duration;
 
 fn main() {
-    let (s1, r1) = unbounded();
-    let (s2, r2) = unbounded();
-    s1.send(10).unwrap();
+    let mut count = 1000;
+    while count > 0 {
+        count -= 1;
 
-    // Since both operations are initially ready, a random one will be executed.
-    select! {
-        recv(r1) -> msg => assert_eq!(msg, Ok(10)),
-        send(s2, 20) -> res => {
-            assert_eq!(res, Ok(()));
-            assert_eq!(r2.recv(), Ok(20));
-        }
+        let now = std::time::Instant::now();
+        std::thread::sleep(Duration::from_millis(500));
+        println!("send thread, delta: {:?}", now.elapsed());
     }
 }

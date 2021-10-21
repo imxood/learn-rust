@@ -28,6 +28,9 @@ fn test_json() {
 
     let i = c.to_digit(10).unwrap();
     println!("i: {}", i);
+
+    let v = vec![1, 2, 3];
+    println!("{:?}", serde_json::to_string(&v).unwrap());
 }
 
 #[test]
@@ -67,14 +70,19 @@ fn test_toml() {
 
 #[test]
 fn test_bytes() {
-    let device = Device::new();
-    // let v = serde_bytes::serialize(&device, serde_bytes::Serialize);
+    let mut device = Device::new();
+    let mut data: Vec<u8> = vec![1, 2, 3, 4, 5, 6];
+    device.data.append(&mut data);
+    let json_data = serde_json::to_string(&device).unwrap();
+    println!("json_data: {:?}", &json_data);
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 struct Device {
-    ip: String,
-    port: u16,
+    pub ip: String,
+    pub port: u16,
+    #[serde(with = "serde_bytes")]
+    pub data: Vec<u8>,
 }
 
 impl Device {
@@ -82,6 +90,7 @@ impl Device {
         Self {
             ip: "127.0.0.1".into(),
             port: 12345,
+            data: Vec::new(),
         }
     }
 }

@@ -1,10 +1,9 @@
 [package]
-name = "crossbeam_channel_examples"
+name = "test_color"
 version = "0.1.0"
 edition = "2018"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-crossbeam-channel = "0.5.1"
-spin_sleep = "1.0.0"
+hsl = "0.1.1"

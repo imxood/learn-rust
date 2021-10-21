@@ -23,3 +23,26 @@ fn test_vec3() {
     let mut count = datas.iter().filter(|x| **x > 5).count();
     println!("大于5的数量是: {}", count);
 }
+
+#[test]
+fn test_vec4() {
+    let data1 = [
+        1, 2, 3, 4,
+        5, 6, 7, 8,
+        9, 10, 11, 12,
+        13,14,15,16
+    ]; // 4 * 4 行列数据
+
+    let width = 4;
+    let height = 4;
+
+    let (x,y, w, h) = (1, 1, 2, 2);
+
+    for i in 0..h {
+        let y1 = y + i;
+        for j in 0..w { 
+            let x1 = x + j;
+            println!("({},{})", x1, y1);
+        }
+    }
+}

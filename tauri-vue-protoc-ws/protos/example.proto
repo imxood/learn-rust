@@ -1,12 +1,5 @@
 syntax = "proto3";
 
-import "rustproto.proto";
-
-// option (rustproto.carllerche_bytes_for_bytes_all) = true;
-// option (rustproto.carllerche_bytes_for_string_all) = true;
-// option (rustproto.serde_derive_all) = true;
-// option (rustproto.generate_accessors_all) = true;
-
 message GetRequest {
   string name = 1;
   int32 age = 2;
@@ -25,5 +18,3 @@ message GetResponse {
   int32 zipcode = 4;
   bytes data = 5;
 }
-
-message Strings { repeated string item = 1; }
