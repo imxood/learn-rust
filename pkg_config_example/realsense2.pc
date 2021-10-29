@@ -1,0 +1,17 @@
+prefix="C:/Program Files (x86)/Intel RealSense SDK 2.0"
+exec_prefix=${prefix}
+includedir=${exec_prefix}/include
+libdir=${exec_prefix}/lib/x64
+dlldir=${exec_prefix}/bin/x64
+
+Name:
+Description: Intel(R) RealSense(tm) Cross Platform API
+Version: 2.47.0
+URL: https://github.com/IntelRealSense/librealsense
+Requires.private:
+Libs: -L${libdir} -lrealsense2
+Libs.private:
+Cflags: -I${includedir} -DDLL_FOLDER=${dlldir}
+
+#TODO check -Wl -Bdynamic
+#Libs: -L${libdir} -Wl,-Bdynamic -lrealsense
