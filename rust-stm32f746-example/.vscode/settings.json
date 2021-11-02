@@ -1,0 +1,4 @@
+{
+    "rust-analyzer.checkOnSave.allTargets": false,
+    "rust-analyzer.checkOnSave.target": "thumbv7em-none-eabi"
+}
