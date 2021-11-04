@@ -1,0 +1,28 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug",
+            "program": "${workspaceFolder}/target/thumbv7em-none-eabihf/debug/rust-stm32f746-example",
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+			"cwd": "${workspaceRoot}",
+			"executable": "${workspaceFolder}/target/thumbv7em-none-eabihf/debug/rust-stm32f746-example",
+			"name": "Debug stm32f746",
+			"request": "launch",
+			"type": "cortex-debug",
+			"servertype": "openocd",
+			"armToolchainPath": "/develop/programs/gcc-arm-none-eabi-9-2020-q2-update/bin",
+			"configFiles": [
+				"/usr/local/share/openocd/scripts/board/stm32f7discovery.cfg"
+			]
+		},
+    ]
+}

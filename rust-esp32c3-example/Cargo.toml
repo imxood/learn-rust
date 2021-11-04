@@ -1,0 +1,13 @@
+[package]
+name = "rust-esp32c3-example"
+version = "0.1.0"
+authors = ["maxu <imxood@gmail.com>"]
+edition = "2018"
+resolver = "2"
+
+[dependencies]
+esp-idf-sys = { version = "0.24.3", features = ["binstart", "native", "std"] }
+
+[build-dependencies]
+embuild = "0.25"
+anyhow = "1"
