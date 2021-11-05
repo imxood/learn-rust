@@ -6,8 +6,16 @@ edition = "2018"
 resolver = "2"
 
 [dependencies]
-esp-idf-sys = { version = "0.24.3", features = ["binstart", "native", "std"] }
+esp-idf-sys = { version = "0.24.3", features = [
+    "native",
+    "binstart"
+], default-features = false }
 
 [build-dependencies]
 embuild = "0.25"
 anyhow = "1"
+
+[profile.release]
+codegen-units = 1
+opt-level = 'z'
+lto = true
