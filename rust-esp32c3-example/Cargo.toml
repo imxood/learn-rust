@@ -13,6 +13,7 @@ esp-idf-svc = "0.28.1"
 st7735-lcd = "0.8.1"
 embedded-graphics = "0.7.1"
 embedded-hal = "0.2.6"
+embedded-svc = "0.12.0"
 # embedded-svc = "0.12"
 # esp32c3 = "0.3.0"
 
