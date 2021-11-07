@@ -1,9 +1,18 @@
 [build]
 # Uncomment the relevant target for your chip here (ESP32, ESP32-S2, ESP32-S3 or ESP32-C3)
-#target = "xtensa-esp32-espidf"
+target = "xtensa-esp32-espidf"
 #target = "xtensa-esp32s2-espidf"
 #target = "xtensa-esp32s3-espidf"
-target = "riscv32imc-esp-espidf"
+#target = "riscv32imc-esp-espidf"
+
+[target.xtensa-esp32-espidf]
+linker = "ldproxy"
+
+[target.xtensa-esp32s2-espidf]
+linker = "ldproxy"
+
+[target.xtensa-esp32s3-espidf]
+linker = "ldproxy"
 
 [target.riscv32imc-esp-espidf]
 linker = "ldproxy"
@@ -18,10 +27,12 @@ build-std = ["std", "panic_abort"]
 build-std-features = ["panic_immediate_abort"]
 
 [env]
-CARGO_FEATURE_INLINE_ASM = { value = "y" }
 ESP_IDF_GLOBAL_INSTALL = { value = "y" }
-
 # === PIO builder ===
+# These configurations will pick up your custom "sdkconfig.release", "sdkconfig.debug" or "sdkconfig.defaults[.*]" files
+# that you might put in the root of the project
+# The easiest way to generate a full "sdkconfig[.release|debug]" configuration (as opposed to manually enabling only the necessary flags via "sdkconfig.defaults[.*]"
+# is by running "cargo pio espidf menuconfig"
 ESP_IDF_SYS_GLOB_BASE = { value = ".", relative = true }
 ESP_IDF_SYS_GLOB_0 = { value = "/sdkconfig.*" }
 
@@ -35,3 +46,5 @@ ESP_IDF_SDKCONFIG_DEFAULTS = { value = "./sdkconfig.defaults", relative = true }
 #ESP_IDF_VERSION = { value = "branch:release/v4.4" }
 # Enables the esp-idf-sys "native" build feature to build against ESP-IDF master (v5.0)
 ESP_IDF_VERSION = { value = "master" }
+
+LIBCLANG_PATH = "/home/maxu/.espressif/tools/xtensa-esp32-elf-clang/esp-12.0.1-20210914-x86_64-unknown-linux-gnu/lib"

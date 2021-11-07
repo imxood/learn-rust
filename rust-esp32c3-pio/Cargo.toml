@@ -1,0 +1,24 @@
+[package]
+name = "rust-esp32c3-pio"
+version = "0.1.0"
+authors = ["imxood <imxood@gmail.com>"]
+edition = "2018"
+resolver = "2"
+
+[profile.release]
+debug = true # Symbols are nice and they don't increase the size on Flash
+opt-level = "z"
+
+[profile.dev]
+opt-level = "s"
+
+[features]
+native = ["esp-idf-sys/native"]
+
+[dependencies]
+esp-idf-sys = { version = "0.24.3", features = ["binstart"] }
+
+
+[build-dependencies]
+embuild = "0.25"
+anyhow = "1"

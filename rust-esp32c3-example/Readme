@@ -1,4 +1,0 @@
-
-
-sdkconfig文件是esp编译工具产生的文件, 一起生成的还有sdkconfig.h, 是配置开关的头文件
-sdkconfig.defaults文件是 如果没有sdkconfig文件, 那么就根据这个默认配置文件生成 sdkconfig

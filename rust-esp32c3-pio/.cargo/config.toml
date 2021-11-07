@@ -5,6 +5,15 @@
 #target = "xtensa-esp32s3-espidf"
 target = "riscv32imc-esp-espidf"
 
+[target.xtensa-esp32-espidf]
+linker = "ldproxy"
+
+[target.xtensa-esp32s2-espidf]
+linker = "ldproxy"
+
+[target.xtensa-esp32s3-espidf]
+linker = "ldproxy"
+
 [target.riscv32imc-esp-espidf]
 linker = "ldproxy"
 
@@ -16,12 +25,15 @@ rustflags = ["-C", "default-linker-libraries"]
 
 build-std = ["std", "panic_abort"]
 build-std-features = ["panic_immediate_abort"]
+configurable-env = true # No longer necessary since 1.56, as it was stabilized: https://github.com/rust-lang/cargo/blob/master/src/cargo/core/features.rs#L698
+extra-link-arg = true   # No longer necessary since 1.56, as it was stabilized: https://github.com/rust-lang/cargo/blob/master/src/cargo/core/features.rs#L695
 
 [env]
-CARGO_FEATURE_INLINE_ASM = { value = "y" }
-ESP_IDF_GLOBAL_INSTALL = { value = "y" }
-
 # === PIO builder ===
+# These configurations will pick up your custom "sdkconfig.release", "sdkconfig.debug" or "sdkconfig.defaults[.*]" files
+# that you might put in the root of the project
+# The easiest way to generate a full "sdkconfig[.release|debug]" configuration (as opposed to manually enabling only the necessary flags via "sdkconfig.defaults[.*]"
+# is by running "cargo pio espidf menuconfig"
 ESP_IDF_SYS_GLOB_BASE = { value = ".", relative = true }
 ESP_IDF_SYS_GLOB_0 = { value = "/sdkconfig.*" }
 
