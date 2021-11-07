@@ -1,80 +1,92 @@
-// use esp32_hal::clock_control::{self, CPUSource, ClockControl};
-// use esp32_hal::dport::Split;
-// use esp32_hal::i2c;
-// use esp32_hal::prelude::*;
-// use esp32_hal::target::Peripherals;
-// use esp32_hal::timer::Timer;
-// use xtensa_lx::mutex::SpinLockMutex;
+#![allow(unused_imports)]
+#![allow(unused)]
 
-#[allow(unused_imports)]
-use esp_idf_sys; // If using the `binstart` feature of `esp-idf-sys`, always keep this module imported
-// use esp32c3 as c3;
+use embedded_graphics::draw_target::DrawTarget;
+use anyhow::Result;
+use embedded_graphics::image::Image;
+use embedded_graphics::Drawable;
+use embedded_graphics::image::ImageRaw;
+use embedded_graphics::image::ImageRawLE;
+use embedded_graphics::pixelcolor::Rgb565;
+use embedded_graphics::prelude::Point;
+use esp_idf_hal as hal;
+use esp_idf_sys;
+use hal::delay::Ets;
+use hal::gpio::InputPin;
+use hal::gpio::OutputPin;
+use hal::prelude::*;
+use hal::{spi, gpio};
+use embedded_hal::blocking::delay::{DelayMs};
+use st7735_lcd::Orientation;
 
-fn main() {
-    println!("1,hello world!");
-    // println!("2,hello world!");
-    // println!("3,hello world!");
-    // println!("4,hello world!");
-    // println!("5,hello world!");
-    // println!("6,hello world!");
-    // println!("7,hello world!");
-    // println!("8,hello world!");
-    // std::thread::sleep(std::time::Duration::from_millis(100));
-    // println!("9,hello world!");
-    // let dp = Peripherals::take().unwrap();
-    // let (mut dport, dport_clock_control) = dp.DPORT.split();
+fn main() -> Result<()> {
+    esp_idf_sys::link_patches();
+    println!("hello world!");
 
-    // let mut clk_ctl = ClockControl::new(
-    //     dp.RTCCNTL,
-    //     dp.APB_CTRL,
-    //     dport_clock_control,
-    //     clock_control::XTAL_FREQUENCY_AUTO,
-    // )
-    // .unwrap();
 
-    // clk_ctl
-    //     .set_cpu_frequencies(
-    //         CPUSource::PLL,
-    //         80.MHz(),
-    //         CPUSource::PLL,
-    //         240.MHz(),
-    //         CPUSource::PLL,
-    //         80.MHz(),
-    //     )
-    //     .unwrap();
+    // Bind the log crate to the ESP Logging facilities
+    // esp_idf_svc::log::EspLogger::initialize_default();
 
-    // let (clkcntrl_config, mut watchdog) = clk_ctl.freeze().unwrap();
+    // 获取 外设 对象
+    let peripherals = Peripherals::take().unwrap();
 
-    // watchdog.disable();
+    // 获取 引脚集合
+    let pins = peripherals.pins;
 
-    // // disable MST watchdogs
-    // let (.., mut watchdog0) = Timer::new(dp.TIMG0, clkcntrl_config);
-    // let (.., mut watchdog1) = Timer::new(dp.TIMG1, clkcntrl_config);
-    // watchdog0.disable();
-    // watchdog1.disable();
+    // 1.8寸 ST7735 LCD屏 所需引脚
+    let rst = pins.gpio5; // 复位
+    let dc = pins.gpio9; // 数据/命令
+    let backlight = pins.gpio8; // 背光
+    
+    let sclk = pins.gpio6;
+    let sdo = pins.gpio7;
+    let cs = pins.gpio10;
 
-    // let pins = dp.GPIO.split();
-    // let i2c0 = i2c::I2C::new(
-    //     dp.I2C0,
-    //     i2c::Pins {
-    //         sda: pins.gpio4,
-    //         scl: pins.gpio15,
-    //     },
-    //     400_000,
-    //     &mut dport,
-    // );
-    // let i2c0 = SpinLockMutex::new(i2c0);
+    // spi config
+    let config = <spi::config::Config as Default>::default()
+        .baudrate(26.MHz().into())
+        .bit_order(spi::config::BitOrder::MSBFirst);
 
-    // let s = 'a';
-    // let mut ss = String::new();
+    // 创建 spi master 对象
+    let master = spi::Master::<spi::SPI2, _, _, _, _>::new(peripherals.spi2, spi::Pins {
+        sclk, sdo, cs: Some(cs), sdi: Option::<gpio::Gpio21<gpio::Unknown>>::None
+    }, config)?;
 
-    // std::thread::spawn(|| {
-    //     println!("thread1!");
-    //     std::thread::sleep(std::time::Duration::from_millis(1000));
-    // });
+    let mut disp = st7735_lcd::ST7735::new(master, dc.into_output()?, rst.into_output()?, true, false, 160, 128);
 
-    // loop {
-    //     println!("thread0!");
-    //     std::thread::sleep(std::time::Duration::from_millis(10));
-    // }
+    let mut delay = Delay::new();
+
+    disp.init(&mut delay).unwrap();
+    disp.set_orientation(&Orientation::Landscape).unwrap();
+    disp.clear(Rgb565::new(0x00, 0x00, 0x00));
+    disp.set_offset(0, 25);
+
+    // draw ferris
+    let image_raw: ImageRawLE<Rgb565> = ImageRaw::new(include_bytes!("assets/ferris.raw"), 86);
+    let image: Image<_> = Image::new(&image_raw, Point::new(0, 0));
+    image.draw(&mut disp).unwrap();
+    
+    // loop { continue; }
+
+
+    Ok(())
+}
+
+
+pub struct Delay {
+    ets: Ets,
+}
+
+impl Delay {
+    pub fn new() -> Self {
+        Self {
+            ets: Ets {}
+        }
+    }
+}
+
+impl DelayMs<u8> for Delay {
+    fn delay_ms(&mut self, ms: u8) {
+        self.ets.delay_ms(ms as u32);
+    }
 }

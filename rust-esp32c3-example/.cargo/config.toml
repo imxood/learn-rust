@@ -18,6 +18,7 @@ build-std = ["std", "panic_abort"]
 build-std-features = ["panic_immediate_abort"]
 
 [env]
+DEP_LV_CONFIG_PATH = {value = ".", relative = true}
 CARGO_FEATURE_INLINE_ASM = { value = "y" }
 ESP_IDF_GLOBAL_INSTALL = { value = "y" }
 

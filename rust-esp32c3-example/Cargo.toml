@@ -6,13 +6,15 @@ edition = "2018"
 resolver = "2"
 
 [dependencies]
-esp-idf-sys = { version = "0.24.3", features = [
-    "native",
-    "binstart",
-], default-features = false }
-# esp32-hal = "0.3.0"
+anyhow = "1.0.45"
+esp-idf-sys = { version = "0.24.3", features = ["binstart"] }
+esp-idf-hal = { version = "0.23.2" }
+esp-idf-svc = "0.28.1"
+st7735-lcd = "0.8.1"
+embedded-graphics = "0.7.1"
+embedded-hal = "0.2.6"
+# embedded-svc = "0.12"
 # esp32c3 = "0.3.0"
-# xtensa-lx = "0.4.0"
 
 [build-dependencies]
 embuild = "0.25"
