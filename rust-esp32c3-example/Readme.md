@@ -50,6 +50,9 @@
         串口：
             cargo espmonitor --chip esp32c3 /dev/ttyACM0
 
+        查看分区信息：
+            parttool.py --port "/dev/ttyACM0" get_partition_info --partition-name=factory
+
 
     sdkconfig文件是esp编译工具产生的文件, 一起生成的还有sdkconfig.h, 是配置开关的头文件
     sdkconfig.defaults文件是 如果没有sdkconfig文件, 那么就根据这个默认配置文件生成 sdkconfig
@@ -91,3 +94,5 @@
             cargo install form
 
             cargo add esp32c3
+
+        parttool.py --port "COM4" get_partition_info --partition-name=factory
