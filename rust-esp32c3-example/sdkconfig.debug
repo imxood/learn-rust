@@ -1,4 +1,6 @@
 
+CONFIG_BT_NIMBLE_ENABLED=y
+
 #
 # Partition Table
 # (It's possible to fit Blufi in 1MB app partition size with some other optimizations, but
@@ -36,4 +38,3 @@ CONFIG_BT_SMP_ENABLE=n
 CONFIG_BT_BLE_BLUFI_ENABLE=y
 CONFIG_MBEDTLS_HARDWARE_MPI=n
 CONFIG_MBEDTLS_DHM_C=y
-CONFIG_BT_NIMBLE_ENABLED=y
