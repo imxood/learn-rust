@@ -19,7 +19,6 @@ use embedded_graphics::{
     Drawable,
 };
 use embedded_hal::blocking::delay::DelayMs;
-use embedded_svc::anyerror::AnyError;
 use esp_idf_hal as hal;
 use esp_idf_sys;
 use hal::delay::{Ets, FreeRtos};
@@ -34,20 +33,20 @@ fn main() {
     esp_idf_sys::link_patches();
     println!("hello world!");
 
-    // std::thread::spawn(|| {
-    //     let mut delay = FreeRtos {};
-    //     loop {
-    //         println!("hello world!");
-    //         delay.delay_ms(1000 as u32);
-    //     }
-    //     // std::thread::sleep(Duration::from_secs(1));
+    std::thread::spawn(|| {
+        let mut delay = FreeRtos {};
+        loop {
+            println!("hello world!");
+            delay.delay_ms(1000 as u32);
+        }
+        // std::thread::sleep(Duration::from_secs(1));
 
-    //     // println!("hello world!");
-    //     // std::thread::sleep(Duration::from_secs(1));
+        // println!("hello world!");
+        // std::thread::sleep(Duration::from_secs(1));
 
-    //     // println!("hello world!");
-    //     // std::thread::sleep(Duration::from_secs(1));
-    // });
+        // println!("hello world!");
+        // std::thread::sleep(Duration::from_secs(1));
+    });
 
     // Bind the log crate to the ESP Logging facilities
     // esp_idf_svc::log::EspLogger::initialize_default();

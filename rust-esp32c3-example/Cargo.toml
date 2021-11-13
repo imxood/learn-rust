@@ -1,14 +1,24 @@
 [package]
-name = "rust-esp32c3-example"
+name = "esp32c3-example"
 version = "0.1.0"
-authors = ["maxu <imxood@gmail.com>"]
+authors = ["imxood <imxood@163.com>"]
 edition = "2018"
 resolver = "2"
 
+[profile.release]
+debug = true # Symbols are nice and they don't increase the size on Flash
+opt-level = "z"
+
+[profile.dev]
+opt-level = "s"
+
+# [features]
+# native = ["esp-idf-sys/native"]
+
 [dependencies]
 # anyhow = "1.0.45"
-esp-idf-sys = { version = "0.24.3", features = ["native", "binstart"], default-features = false }
-esp-idf-hal = { version = "0.23.2" }
+esp-idf-sys = { version = "0.24", features = ["binstart"]}
+esp-idf-hal = { version = "0.24" }
 # esp-idf-svc = "0.29"
 st7735-lcd = "0.8.1"
 embedded-graphics = "0.7.1"
@@ -19,11 +29,7 @@ rusttype = "0.9.2"
 # embedded-svc = "0.12"
 # esp32c3 = "0.3.0"
 
+
 [build-dependencies]
 embuild = "0.25"
 anyhow = "1"
-
-[profile.release]
-codegen-units = 1
-opt-level = 'z'
-lto = true
