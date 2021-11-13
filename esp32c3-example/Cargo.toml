@@ -1,7 +1,7 @@
 [package]
-name = "rust-esp32c3-pio"
+name = "esp32c3-example"
 version = "0.1.0"
-authors = ["imxood <imxood@gmail.com>"]
+authors = ["imxood <imxood@163.com>"]
 edition = "2018"
 resolver = "2"
 
