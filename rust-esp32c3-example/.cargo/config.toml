@@ -19,7 +19,7 @@ build-std-features = ["panic_immediate_abort"]
 
 [env]
 # CARGO_FEATURE_INLINE_ASM = { value = "y" }
-# ESP_IDF_GLOBAL_INSTALL = { value = "y" }
+ESP_IDF_GLOBAL_INSTALL = { value = "y" }
 
 # === PIO builder ===
 ESP_IDF_SYS_GLOB_BASE = { value = ".", relative = true }

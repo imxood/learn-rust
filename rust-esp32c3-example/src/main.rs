@@ -1,8 +1,6 @@
 #![allow(unused_imports)]
 #![allow(unused)]
 
-use std::time::Duration;
-
 use embedded_font::FontTextStyleBuilder;
 use embedded_graphics::{
     draw_target::DrawTarget,
@@ -20,7 +18,10 @@ use embedded_graphics::{
 };
 use embedded_hal::blocking::delay::DelayMs;
 use esp_idf_hal as hal;
-use esp_idf_sys;
+use esp_idf_svc::{
+    netif::EspNetifStack, nvs::EspDefaultNvs, sysloop::EspSysLoopStack, wifi::EspWifi,
+};
+use esp_idf_sys::{esp_bt_controller_enable, esp_bt_mode_t_ESP_BT_MODE_BLE};
 use hal::delay::{Ets, FreeRtos};
 use hal::gpio::InputPin;
 use hal::gpio::OutputPin;
@@ -28,16 +29,29 @@ use hal::prelude::*;
 use hal::{gpio, spi};
 use rusttype::Font;
 use st7735_lcd::Orientation;
+use std::{sync::Arc, time::Duration};
+
+mod wifi;
+use wifi::*;
+
+fn init_bt() {
+    unsafe {
+        std::thread::sleep(Duration::from_millis(1000));
+        esp_bt_controller_enable(esp_bt_mode_t_ESP_BT_MODE_BLE);
+    }
+}
 
 fn main() {
     esp_idf_sys::link_patches();
     println!("hello world!");
 
+    init_bt();
+
     std::thread::spawn(|| {
         let mut delay = FreeRtos {};
         loop {
-            println!("hello world!");
-            delay.delay_ms(1000 as u32);
+            println!("ha");
+            delay.delay_ms(10000 as u32);
         }
         // std::thread::sleep(Duration::from_secs(1));
 
@@ -110,27 +124,33 @@ fn main() {
     .text_color(Rgb565::WHITE)
     .build();
 
-    Text::new("Hello World!", Point::new(15, 30), style)
-        .draw(&mut display)
-        .unwrap();
+    let text = Text::new("Hello World!", Point::new(15, 30), style);
 
-    // let output_settings = OutputSettingsBuilder::new().scale(2).build();
-    // Window::new("Fonts", &output_settings).show_static(&display);
+    //初始化wifi
+    let netif_stack = Arc::new(EspNetifStack::new().unwrap());
+    println!("hello 003!");
+    let sys_loop_stack = Arc::new(EspSysLoopStack::new().unwrap());
+    println!("hello 004!");
+    let default_nvs = Arc::new(EspDefaultNvs::new().unwrap());
+    println!("hello 005!");
+    let mut wifi = Box::new(EspWifi::new(netif_stack, sys_loop_stack, default_nvs).unwrap());
+
+    println!("Hello, world!");
+
+    wifi_connect(wifi.as_mut(), "maxu", "mx123456");
 
     // draw ferris
-    // let image_raw: ImageRawLE<Rgb565> = ImageRaw::new(include_bytes!("assets/ferris.raw"), 86);
-    // let image: Image<_> = Image::new(&image_raw, Point::new(34, 8));
+    let image_raw: ImageRawLE<Rgb565> = ImageRaw::new(include_bytes!("assets/ferris.raw"), 86);
+    let image: Image<_> = Image::new(&image_raw, Point::new(34, 8));
 
-    // loop {
-    //     display.clear(Rgb565::BLACK.into());
-    //     image.draw(&mut display).unwrap();
-    //     std::thread::sleep(Duration::from_millis(1000));
+    loop {
+        display.clear(Rgb565::BLACK.into());
 
-    //     display.clear(Rgb565::WHITE.into());
-    //     image.draw(&mut display).unwrap();
-    //     std::thread::sleep(Duration::from_millis(1000));
-    //     println!("ok!");
-    // }
+        image.draw(&mut display).unwrap();
+        text.draw(&mut display).unwrap();
+
+        std::thread::sleep(Duration::from_millis(1000));
+    }
 }
 
 pub struct Delay {
