@@ -17,5 +17,5 @@ protobuf = { git = "https://github.com/stepancheg/rust-protobuf.git", branch = "
 ] }
 
 [build-dependencies]
-protobuf-codegen-pure = { git = "https://github.com/stepancheg/rust-protobuf.git", branch = "master" }
+protobuf-codegen = { git = "https://github.com/stepancheg/rust-protobuf.git", branch = "master" }
 # protobuf-codegen-pure = "2.25.1"

@@ -1,2 +1,0 @@
-[env]
-PKG_CONFIG_PATH = { value = ".", relative = true }

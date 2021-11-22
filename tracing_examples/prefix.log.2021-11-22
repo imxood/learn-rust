@@ -1,0 +1,4 @@
+2021-11-22T03:26:17.354824Z  INFO tracing_examples: message: hello
+2021-11-22T03:26:17.355118Z  INFO tracing_examples: message: thread1
+ INFO tracing_examples: message: hello
+ INFO tracing_examples: message: thread1

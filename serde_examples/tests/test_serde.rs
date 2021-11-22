@@ -3,25 +3,18 @@ use serde_derive::{Deserialize, Serialize};
 #[test]
 fn test_json() {
     #[derive(Deserialize, Serialize, Debug)]
-    pub struct Distance {
+    pub struct DistanceNumber {
         distance: usize,
     }
 
     #[derive(Deserialize, Serialize, Debug)]
     pub enum InteractiveStyle {
         None,
-        Camera(Distance),
+        Camera(DistanceNumber),
         Origin,
     }
 
-    let interactive_style = InteractiveStyle::None;
-    println!("{:?}", serde_json::to_string(&interactive_style).unwrap());
-
-    let interactive_style = InteractiveStyle::Camera(Distance { distance: 11 });
-    println!("{:?}", serde_json::to_string(&interactive_style).unwrap());
-
-    let interactive_style = InteractiveStyle::Origin;
-    println!("{:?}", serde_json::to_string(&interactive_style).unwrap());
+    // basic
 
     let c = '1';
     println!("{:?}", serde_json::to_string(&c).unwrap());
@@ -31,6 +24,31 @@ fn test_json() {
 
     let v = vec![1, 2, 3];
     println!("{:?}", serde_json::to_string(&v).unwrap());
+
+    // enum
+
+    let interactive_style = InteractiveStyle::None;
+    println!("{:?}", serde_json::to_string(&interactive_style).unwrap());
+
+    let interactive_style = InteractiveStyle::Camera(DistanceNumber { distance: 11 });
+    println!("{:?}", serde_json::to_string(&interactive_style).unwrap());
+
+    let interactive_style = InteractiveStyle::Origin;
+    println!("{:?}", serde_json::to_string(&interactive_style).unwrap());
+
+    let v: InteractiveStyle = serde_json::from_str("\"None\"").unwrap();
+    println!("{:?}", &v);
+
+    // Option
+
+    let v = Some(DistanceNumber { distance: 10 });
+    println!("{:?}", serde_json::to_string(&v).unwrap());
+
+    let v = Option::<DistanceNumber>::None;
+    println!("{:?}", serde_json::to_string(&v).unwrap());
+
+    let v: Option<DistanceNumber> = serde_json::from_str("null").unwrap();
+    println!("{:?}", &v);
 }
 
 #[test]
@@ -65,7 +83,19 @@ fn test_toml() {
     let recipe_toml = toml::Value::try_from(c).unwrap();
     println!("recipe_toml(fails) = {}", recipe_toml.to_string());
 
-    // println!("{:?}", toml::to_string(&c).unwrap());
+    #[derive(Deserialize, Serialize, Debug)]
+    struct D {
+        d: i32,
+    }
+
+    #[derive(Deserialize, Serialize, Debug)]
+    struct Config {
+        d: Option<D>,
+    }
+
+    let d = Config { d: None };
+
+    println!("{:?}", toml::to_string(&d).unwrap());
 }
 
 #[test]

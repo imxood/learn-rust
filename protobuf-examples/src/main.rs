@@ -17,8 +17,9 @@ fn main() {
     println!("out_msg: {:?}", &out_msg);
     println!("out_bytes: {:?}", &out_bytes);
 
-    // let json_data = serde_json::to_string(&out_msg).unwrap();
-    // println!("json_data: {:?}", &json_data);
+    // 从 对象 转 json字符串
+    let json_data = serde_json::to_string(&out_msg).unwrap();
+    println!("json_data: {:?}", &json_data);
 
     //////////////////////////////////////
     // 从 字节数组 转 对象
@@ -48,9 +49,6 @@ fn main() {
     // 从 字节数组 转 对象
     let in_resp: GetResponse = Message::parse_from_bytes(&out_bytes).unwrap();
 
-    // let json_data = serde_json::to_string(&out_resp).unwrap();
-    // println!("json_data: {:?}", &json_data);
-
     assert_eq!(in_resp.status, out_resp.status);
     assert_eq!(in_resp.zipcode, out_resp.zipcode);
     assert_eq!(in_resp.get_address(), out_resp.get_address());
@@ -58,11 +56,32 @@ fn main() {
     let msg = serde_json::to_string(&out_resp).unwrap();
     println!("msg: {:?}", &msg);
 
-    // let s = vec!["hello", "world!"];
-    // let s: Vec<Chars> = s.iter().map(|x| Chars::from(*x)).collect();
-    // let mut ss = Strings::new();
-    // ss.set_item(s);
-    // println!("out_bytes: {:?}", ss.write_to_bytes().unwrap());
-    // let ss = serde_json::to_string(&ss).unwrap();
-    // println!("ss: {:?}", &ss);
+    // 测试合并 1
+    let mut req1 = GetRequest::new();
+    req1.set_name("John Smith".into());
+    println!("test1 req1: {:?}", &req1);
+
+    let mut req2 = GetRequest::new();
+    req2.set_age(25);
+    println!("req2: {:?}", &req2);
+
+    let ret = req2.write_to_bytes().unwrap();
+    req1.merge_from_bytes(&ret).unwrap();
+
+    println!("req1: {:?}", &req1);
+
+    // 测试合并 2 覆盖
+    let mut req1 = GetRequest::new();
+    req1.set_name("John Smith".into());
+    req1.set_age(25);
+    println!("test2 req1: {:?}", &req1);
+
+    let mut req2 = GetRequest::new();
+    req2.set_name("maxu".into());
+    println!("req2: {:?}", &req2);
+
+    let ret = req2.write_to_bytes().unwrap();
+    req1.merge_from_bytes(&ret).unwrap();
+
+    println!("req1: {:?}", &req1);
 }
