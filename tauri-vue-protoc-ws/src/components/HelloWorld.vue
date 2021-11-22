@@ -1,11 +1,24 @@
 <script setup lang="ts">
 import { getCurrent } from '@tauri-apps/api/window'
-import { ref, onMounted } from 'vue'
+import { ref, inject, onMounted } from 'vue'
 import { GetRequest, GetResponse } from '../protos/example'
 import axios from 'axios';
 import { JsonValue } from "@protobuf-ts/runtime";
+import {
+  UpdateRawStudentKey,
+  UpdateRefStudentKey,
+  CreateTeacherKey,
+  UpdateTeachertKey,
+  AllUpdateRefStudentKey
+} from '../types';
 
 defineProps<{ msg: string }>()
+
+const update_raw_student = inject(UpdateRawStudentKey)
+const update_ref_student = inject(UpdateRefStudentKey)
+const create_teacher = inject(CreateTeacherKey)
+const update_teacher = inject(UpdateTeachertKey)
+const all_update_ref_student = inject(AllUpdateRefStudentKey)
 
 onMounted(() => {
 
@@ -38,15 +51,24 @@ onMounted(() => {
   }
 })
 
-const count_clicked = async (e: Event) => {
-  count.value++;
-
+const test_proto_clicked = async (e: Event) => {
   let req = GetRequest.create();
   req.name = "maxu";
   req.age = 18;
 
   let binary = GetRequest.toBinary(req);
   console.log("send binary", binary);
+
+  axios.post("http://127.0.0.1:8080/test_json").then((res) => {
+    console.log("------------ proto ------------");
+    console.log("recv binary", res.data);
+    console.log("res.data type", typeof res.data);
+    let bin = new Uint8Array(res.data as ArrayBuffer);
+    console.log("recv binary", bin);
+    console.log("recv req", GetRequest.fromBinary(bin));
+  }).catch((error) => {
+    console.log(error);
+  });
 
   axios.post("http://127.0.0.1:8080/proto", binary, { responseType: "arraybuffer" }).then((res) => {
     console.log("------------ proto ------------");
@@ -67,39 +89,21 @@ const count_clicked = async (e: Event) => {
   }).catch((error) => {
     console.log(error);
   });
-
-  // let ret = await new HttpRequest("http://127.0.0.1:8080/proto").data(binary).post()
 }
-
-const count = ref(0)
 </script>
 
 <template>
   <h1>{{ msg }}</h1>
-
-  <p>
-    Recommended IDE setup:
-    <a href="https://code.visualstudio.com/" target="_blank">VSCode</a>
-    +
-    <a href="https://github.com/johnsoncodehk/volar" target="_blank">Volar</a>
-  </p>
-
-  <p>
-    See
-    <code>README.md</code> for more information.
-  </p>
-
-  <p>
-    <a href="https://vitejs.dev/guide/features.html" target="_blank">Vite Docs</a>
-    |
-    <a href="https://v3.vuejs.org/" target="_blank">Vue 3 Docs</a>
-  </p>
-
-  <button type="button" @click="count_clicked">count is: {{ count }}</button>
-  <p>
-    Edit
-    <code>components/HelloWorld.vue</code> to test hot module replacement.
-  </p>
+  <div>
+    <button type="button" @click="test_proto_clicked">test_proto</button>
+  </div>
+  <div>
+    <button type="button" @click="update_raw_student">update_raw_student</button>
+    <button type="button" @click="update_ref_student">update_ref_student</button>
+    <button type="button" @click="all_update_ref_student">all_update_ref_student</button>
+    <button type="button" @click="create_teacher">create_teacher</button>
+    <button type="button" @click="update_teacher">update_teacher</button>
+  </div>
 </template>
 
 <style scoped>

@@ -14,6 +14,6 @@ fn build_proto() {
 }
 
 fn main() {
-  // build_proto();
+  build_proto();
   tauri_build::build()
 }
