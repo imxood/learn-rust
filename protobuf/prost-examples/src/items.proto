@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+// 会在 OUT_DIR 目录下生成 snazzy.items.rs 文件
+package snazzy.items;
+
+// A snazzy new shirt!
+message Shirt {
+    enum Size {
+        SMALL = 0;
+        MEDIUM = 1;
+        LARGE = 2;
+    }
+
+    string color = 1;
+    Size size = 2;
+}
