@@ -10,18 +10,15 @@ fn main() {
         "[year]-[month]-[day] [hour]:[minute]:[second].[subsecond]"
     ));
 
-    let sub = tracing_subscriber::fmt()
-        .with_timer(local_timer)
-        .with_ansi(false);
-
     let file_appender =
         tracing_appender::rolling::daily(std::env::current_dir().unwrap(), "prefix.log");
     let (non_blocking, _guard) = tracing_appender::non_blocking(file_appender);
 
-    #[cfg(debug_assertions)]
-    let sub = sub.with_writer(non_blocking);
-
-    sub.init();
+    tracing_subscriber::fmt()
+        .with_timer(local_timer)
+        .with_ansi(false)
+        .with_writer(non_blocking)
+        .init();
 
     info!("now: {:?}", std::time::SystemTime::now());
 
