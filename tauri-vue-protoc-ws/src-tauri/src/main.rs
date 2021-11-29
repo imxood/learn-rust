@@ -21,8 +21,8 @@ mod req;
 mod web;
 
 fn main() -> Result<()> {
-  test_proto();
   init_log()?;
+  test_proto();
 
   tauri::Builder::default()
     .setup(|app| {
@@ -72,6 +72,8 @@ pub fn opt_format(
 fn test_proto() {
   // 构造一个对象
   let mut out_msg = GetRequest::new();
+  log::info!("GetRequest::new: {:?}", serde_json::to_string(&out_msg));
+
   out_msg.name = "John Smith".into();
   out_msg.age = 25;
   out_msg.features.push("one".into());

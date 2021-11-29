@@ -27,3 +27,11 @@ message GetResponse {
 }
 
 message Strings { repeated string item = 1; }
+
+message Req {
+  oneof Request {
+    bool Hello = 1;
+    GetRequest GetRequest = 2;
+    GetResponse GetResponse = 3;
+  }
+}

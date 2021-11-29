@@ -1,0 +1,202 @@
+syntax = "proto3";
+
+enum NodeDataStyle {
+  // 1位灰度
+  Grey = 0;
+  // 3位RGB + 灰度值 + 角度
+  RgbGreyAngle = 5;
+}
+
+enum DeviceType {
+  JiXie1 = 0;
+  JiXie2 = 1;
+  Longlin1 = 2;
+}
+
+enum PowerType {
+  Plc = 0;
+  Relay = 1;
+  SerialRelay = 2;
+}
+
+message DeviceNet {
+  uint32 node_number_x = 1;
+  uint32 node_number_y = 2;
+  uint32 module_number_x = 3;
+  uint32 module_number_y = 4;
+  NodeDataStyle node_data_style = 5;
+  string local_ip = 6;
+  uint32 local_port = 7;
+  string device_start_ip = 8;
+  uint32 device_start_port = 9;
+  uint32 device_ip_unit_ports = 10;
+  DeviceType device_type = 11;
+  uint32 device_groups = 12;
+  string power_ip = 13;
+  string power_local_ip = 14;
+  uint32 power_local_port = 15;
+  uint32 power_module_number = 16;
+  uint32 power_port = 17;
+  PowerType power_type = 18;
+}
+
+enum SourceType {
+  None = 0;
+  Image = 1;
+  Video = 2;
+}
+enum LoopStyle {
+  Orderly = 0;
+  ListLoop = 1;
+  SingleLoop = 2;
+  RandomLoop = 3;
+}
+
+message NoneSource {
+  SourceType SourceType = 1;
+  string color = 2;
+}
+
+message ImageSource {
+  SourceType style = 1;
+  string image_dir = 2;
+  repeated string image_list = 3;
+  uint32 image_refresh_interval = 4;
+}
+
+message VideoSource {
+  SourceType style = 1;
+  /// 循环方式: 无, 单循环, 列表循环
+  LoopStyle loop_style = 2;
+  repeated string video_list = 3;
+}
+
+enum InteractiveStyle {
+  // 只播放视频
+  Video = 0;
+  // 只播放摄像头
+  Camera = 1;
+  // 播放视频, 当有人时 进入摄像头交互
+  VideoCamera = 2;
+  // 摄像头设置页面
+  CameraSettingsView = 3;
+  // 摄像头设置预览
+  CameraSettingsPreview = 4;
+}
+
+message PlaySource {
+
+  // 播放图片的参数
+  NoneSource none_source = 1;
+
+  // 播放图片的参数
+  ImageSource image_source = 2;
+
+  // 播放视频的参数
+  VideoSource video_source = 3;
+
+  // 当前 选择的 source
+  SourceType source_type = 4;
+
+  InteractiveStyle interactive_style = 5;
+}
+
+message PlayParam {
+  /// 调试模式, 用于没有屏幕可用时, 忽略网络连接 和 数据发送 及 其它.
+  bool debug = 3;
+
+  /// 角度刷新间隔, 单位ms
+  uint32 angle_refresh_interval = 4;
+  /// 颜色填充
+  uint32 color_fill = 5;
+  /// 翻片速度
+  uint32 turning_speed = 6;
+  /// 感应到人像素数
+  uint32 person_pixel_number = 7;
+
+  // 电机速度: 1~4
+  uint32 motor_speed = 8;
+
+  // 深度相机最小距离
+  float depth_camera_min_distance = 9;
+  // 深度相机最大距离
+  float depth_camera_max_distance = 10;
+
+  // 相机选中区域的起始位置及选中区域的宽和高
+  float camera_area_start_x = 11;
+  float camera_area_start_y = 12;
+  float camera_area_start_w = 13;
+  float camera_area_start_h = 14;
+
+  /* 灰度计算: (R + G + B) / 3 */
+  /* 有 RGB 得到灰度, 再根据灰度深浅区 按比例 在角度区间 找到 对应的角度
+   */
+  // 灰度阈值: 深色区 0 ~ gray_threshold ~ 255 浅色区
+  uint32 gray_threshold = 15;
+
+  // 旋转角度 -185 - 185°
+
+  // 深色区
+  int32 deep_angle_low = 16;
+  int32 deep_angle_high = 17;
+
+  // 浅色区
+  int32 shallow_angle_low = 18;
+  int32 shallow_angle_high = 19;
+}
+
+message TimeParam {
+  // pub boot_start = 0.0,
+  // pub boot_end = 0.0,
+  // 自动休眠
+  bool auto_sleep = 1;
+  // 间隔显示时间
+  uint32 show_time = 2;
+  // 间隔休眠时间
+  uint32 sleep_time = 3;
+}
+
+message ManuConfig {
+  DeviceNet device_net = 1;
+  PlaySource play_source = 2;
+  PlayParam play_param = 3;
+  TimeParam time_param = 4;
+}
+
+enum UserType {
+  // 基本用户: 客户
+  Basic = 0;
+  // 测试用户: 测试 调试 用户
+  Test = 1;
+  // 管理员, 完全的权限
+  Admin = 2;
+}
+
+message User {
+  string user = 1;
+  string password = 2;
+  UserType kind = 3;
+}
+
+message VideoPlayParam {
+  repeated string files = 1;
+  InteractiveStyle interactive_style = 2;
+}
+
+enum PlayStatus {
+  Ready = 0;
+  Playing = 1;
+  Paused = 2;
+  Stopped = 3;
+}
+
+message SetDeviceNet { DeviceNet device_net = 1; }
+
+message SetPlayParam { PlayParam play_param = 1; }
+
+message PlayRequest {
+  oneof test_one {
+    SetDeviceNet req1 = 1;
+    SetPlayParam req2 = 2;
+  }
+}
