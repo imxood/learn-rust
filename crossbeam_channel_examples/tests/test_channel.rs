@@ -1,9 +1,9 @@
 use std::{
-    thread,
+    thread::{self, sleep, spawn},
     time::{self, Duration},
 };
 
-use crossbeam_channel::unbounded;
+use crossbeam_channel::{unbounded, bounded};
 
 #[test]
 fn test_channel() {
@@ -55,5 +55,48 @@ fn test_thread() {
         // thread::sleep(Duration::from_millis(1));
         spin_sleep::sleep(Duration::from_millis(1));
         println!("send thread, delta: {:?}", now.elapsed());
+    }
+}
+
+
+/* 
+    这里的 mpsc 只是， 多个发送 多个接收, 但 数据只能被 一个 rx接收后, 这个数据就没了， 不会存在其它的 rx 中
+*/
+#[test]
+fn test_mpmc() {
+    let (tx, rx) = bounded::<u32>(10);
+    let rx0 = rx.clone();
+
+    spawn(move || loop {
+        if rx0.is_empty() {
+            println!("rx0 -- is empty");
+        } else {
+            println!("rx0 -- is not empty");
+        }
+        // if let Ok(data) = rx0.try_recv() {
+        //     println!("rx0 -- recved data: {}", data);
+        // }
+        sleep(Duration::from_millis(1000));
+    });
+
+    spawn(move || loop {
+        if rx.is_empty() {
+            println!("rx -- is empty");
+        } else {
+            println!("rx -- is not empty");
+        }
+        if let Ok(data) = rx.try_recv() {
+            println!("rx -- recved data: {}", data);
+        }
+        sleep(Duration::from_millis(1000));
+    });
+
+    let mut i = 0u32;
+    loop {
+        sleep(Duration::from_millis(3000));
+        if tx.send(i).is_err() {
+            println!("tx -- send error");
+        }
+        i += 1;
     }
 }
