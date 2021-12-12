@@ -1,3 +1,5 @@
+#![feature(vec_into_raw_parts)]
+
 #[test]
 fn test_vec() {
     let mut arr1 = vec![0; 5];
@@ -20,16 +22,16 @@ fn test_vec2() {
 #[test]
 fn test_vec3() {
     let datas = [1, 3, 5, 7, 2, 4, 6, 8];
-    let mut count = datas.iter().filter(|x| **x > 5).count();
+    let count = datas.iter().filter(|x| **x > 5).count();
     println!("大于5的数量是: {}", count);
 }
 
 #[test]
 fn test_vec4() {
-    let data1 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]; // 4 * 4 行列数据
+    let _data1 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]; // 4 * 4 行列数据
 
-    let width = 4;
-    let height = 4;
+    let _width = 4;
+    let _height = 4;
 
     let (x, y, w, h) = (1, 1, 2, 2);
 
@@ -94,8 +96,10 @@ fn test_vec6() {
 
 #[test]
 fn test_vec7() {
+    use std::mem::ManuallyDrop;
     use std::time::Instant;
 
+    #[derive(Clone)]
     pub struct Color32(pub [u8; 4]);
 
     impl Color32 {
@@ -105,7 +109,9 @@ fn test_vec7() {
     }
 
     let size = (1280, 720);
-    let len = size.0 * size.1;
+    let width = size.0;
+    let height = size.1;
+    let len = width * height;
 
     // 不初始化数据, 直接使用
     let mut pixels = Vec::<Color32>::with_capacity(len);
@@ -115,16 +121,52 @@ fn test_vec7() {
 
     let now = Instant::now();
 
-    let time1 = now.elapsed();
+    // 测试 生成 _pixels 的时间, 寻找更好的生成方式
 
-    // 测试 生成 _pixels 的时间, 寻找更好的计算法师
+    {
+        let pixels = pixels.clone();
 
-    let _pixels: Vec<Vec<(u8, u8, u8, u8)>> = pixels
-        .chunks(size.0 as usize)
-        .map(|row| row.iter().map(|srgba| srgba.to_tuple()).collect())
-        .collect();
+        // 方法1
+        let time1 = now.elapsed();
 
-    let time2 = now.elapsed();
+        let _pixels: Vec<Vec<(u8, u8, u8, u8)>> = pixels
+            .chunks(width)
+            .map(|row| row.iter().map(|srgba| srgba.to_tuple()).collect())
+            .collect();
 
-    println!("elapsed: {:?}", time2 - time1);
+        let time2 = now.elapsed();
+
+        println!("elapsed: {:?}", time2 - time1);
+    }
+
+    {
+        let pixels = pixels.clone();
+
+        // 方法2
+        let time1 = now.elapsed();
+
+        let (ptr, len, cap) = pixels.into_raw_parts();
+
+        let old_pixels = unsafe { Vec::from_raw_parts(ptr as *mut (u8, u8, u8, u8), len, cap) };
+        let mut old_pixels = ManuallyDrop::new(old_pixels);
+
+        let pixels: Vec<Vec<(u8, u8, u8, u8)>> = old_pixels
+            .chunks_mut(width)
+            .map(|row| {
+                // let mut row = std::mem::ManuallyDrop::new(row);
+                let len = row.len();
+                unsafe { Vec::from_raw_parts(row.as_mut_ptr(), len, len) }
+            })
+            .collect();
+
+        std::mem::forget(old_pixels);
+
+        // drop(pixels);
+        // ManuallyDrop::into_inner(old_pixels);
+
+        let time2 = now.elapsed();
+
+        println!("len: {:?}", pixels.len());
+        println!("elapsed: {:?}", time2 - time1);
+    }
 }
