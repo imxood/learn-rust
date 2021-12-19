@@ -1,5 +1,7 @@
 #![feature(vec_into_raw_parts)]
 
+use std::{io::Read, mem::ManuallyDrop, time::Instant};
+
 #[test]
 fn test_vec() {
     let mut arr1 = vec![0; 5];
@@ -147,8 +149,8 @@ fn test_vec7() {
 
         let (ptr, len, cap) = pixels.into_raw_parts();
 
-        let old_pixels = unsafe { Vec::from_raw_parts(ptr as *mut (u8, u8, u8, u8), len, cap) };
-        let mut old_pixels = ManuallyDrop::new(old_pixels);
+        let mut old_pixels = unsafe { Vec::from_raw_parts(ptr as *mut (u8, u8, u8, u8), len, cap) };
+        // let mut old_pixels = ManuallyDrop::new(old_pixels);
 
         let pixels: Vec<Vec<(u8, u8, u8, u8)>> = old_pixels
             .chunks_mut(width)
@@ -158,6 +160,10 @@ fn test_vec7() {
                 unsafe { Vec::from_raw_parts(row.as_mut_ptr(), len, len) }
             })
             .collect();
+
+        unsafe {
+            old_pixels.set_len(0);
+        }
 
         std::mem::forget(old_pixels);
 
@@ -169,4 +175,13 @@ fn test_vec7() {
         println!("len: {:?}", pixels.len());
         println!("elapsed: {:?}", time2 - time1);
     }
+}
+
+#[test]
+fn test_vect8() {
+    let raw_data = vec![01u8; 20];
+    let mut data = std::mem::ManuallyDrop::new(raw_data);
+    let new_data = unsafe { Vec::from_raw_parts(data.as_mut_ptr().add(8), 8, 8) };
+    drop(new_data);
+    println!("ok");
 }
