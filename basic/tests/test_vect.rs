@@ -185,3 +185,18 @@ fn test_vect8() {
     drop(new_data);
     println!("ok");
 }
+
+#[test]
+fn test_mem_vec() {
+    let a = test_mem_vec1();
+    println!("new a: {:?}", &a);
+}
+
+fn test_mem_vec1() -> Vec<u8> {
+    let mut a = vec![1u8, 2, 3, 4];
+    let b = unsafe { Vec::from_raw_parts(a.as_mut_ptr(), a.len(), a.capacity()) };
+    println!("a: {:?}", &a);
+    println!("b: {:?}", &b);
+    std::mem::forget(a);
+    b
+}
