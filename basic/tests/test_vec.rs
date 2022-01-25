@@ -200,3 +200,45 @@ fn test_mem_vec1() -> Vec<u8> {
     std::mem::forget(a);
     b
 }
+
+#[test]
+fn test_to_vec() {
+    let a = vec![1, 2, 3, 4, 5];
+    let a_s = a.as_slice();
+
+    let mut b = a_s.to_vec();
+    b.push(6);
+
+    println!("a: {:?}, a: {:?}", &a, &b);
+}
+
+#[test]
+fn test_drop() {
+    pub struct CameraData {
+        pub raw_data: Vec<u8>,
+        pub raw_width: usize,
+        pub raw_height: usize,
+        pub choose_data: Vec<u32>,
+        pub choose_width: usize,
+        pub choose_height: usize,
+        pub has_person: bool,
+    }
+
+    impl Drop for CameraData {
+        fn drop(&mut self) {
+            println!("CameraData dropping");
+        }
+    }
+
+    let data = CameraData {
+        raw_data: vec![0u8; 1280 * 720 * 4],
+        raw_width: 1280,
+        raw_height: 720,
+        choose_data: vec![0u32; 4 * 4],
+        choose_width: 4,
+        choose_height: 4,
+        has_person: false,
+    };
+
+    drop(data);
+}
