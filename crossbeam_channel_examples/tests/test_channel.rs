@@ -1,9 +1,13 @@
 use std::{
+    sync::{
+        atomic::{AtomicBool, Ordering},
+        Arc,
+    },
     thread::{self, sleep, spawn},
     time::{self, Duration},
 };
 
-use crossbeam_channel::{unbounded, bounded};
+use crossbeam_channel::{bounded, unbounded};
 
 #[test]
 fn test_channel() {
@@ -58,8 +62,7 @@ fn test_thread() {
     }
 }
 
-
-/* 
+/*
     这里的 mpsc 只是， 多个发送 多个接收, 但 数据只能被 一个 rx接收后, 这个数据就没了， 不会存在其它的 rx 中
 */
 #[test]
@@ -99,4 +102,21 @@ fn test_mpmc() {
         }
         i += 1;
     }
+}
+
+#[test]
+fn test_channel1() {
+    let (tx, rx) = unbounded::<Arc<AtomicBool>>();
+
+    thread::spawn(move || {
+        while let Ok(active) = rx.recv() {
+            spin_sleep::sleep(Duration::from_secs(5));
+            active.store(true, Ordering::Relaxed);
+        }
+    });
+
+    let active = Arc::new(AtomicBool::new(false));
+
+    tx.send(active.clone()).unwrap();
+    println!("active: {:?}", &active);
 }

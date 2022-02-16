@@ -1,0 +1,24 @@
+[package]
+name = "android-bevy-examples"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+bevy = { path = "../../bevy" }
+log = "0.4.14"
+ndk = { version = "0.5.0", features = ["api-level-30", "trace"] }
+ndk-glue = { version = "0.5.0", features = ["logger"] }
+
+# Android
+[[example]]
+crate-type = ["cdylib"]
+name = "hello_bevy"
+path = "examples/hello_bevy.rs"
+
+[package.metadata.android]
+apk_label = "Bevy Example"
+assets = "assets"
+res = "assets/android-res"
+icon = "@mipmap/ic_launcher"
