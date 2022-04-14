@@ -13,3 +13,10 @@ image = "0.23.14"
 pollster = "0.2.4"
 wgpu = "0.11.1"
 winit = "0.26.0"
+
+[profile.release]
+strip = true
+opt-level = 3
+overflow-checks = false
+debug = 0
+lto = true
