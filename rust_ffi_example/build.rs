@@ -17,12 +17,17 @@ fn main() {
             "cargo:rustc-link-search=native={}/rust_library_static/target/debug",
             &path
         );
+        println!(
+            "cargo:rustc-link-search=native={}/rust_library_static1/target/debug",
+            &path
+        );
 
         // 添加 静态库或动态库 的名称
         println!("cargo:rustc-link-lib=dylib=add_dyn");
         println!("cargo:rustc-link-lib=static=add_static");
         println!("cargo:rustc-link-lib=dylib=minus_dyn");
         println!("cargo:rustc-link-lib=static=minus_static");
+        println!("cargo:rustc-link-lib=static=minus_static1");
     }
 
     #[cfg(target_os = "windows")]
