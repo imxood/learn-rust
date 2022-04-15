@@ -7,6 +7,6 @@ edition = "2021"
 
 [lib]
 name = "minus"
-crate-type = ["cdylib"]
+crate-type = ["dylib"]
 
 [dependencies]
