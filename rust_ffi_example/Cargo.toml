@@ -1,5 +1,5 @@
 [package]
-name = "rust_call_c_lib"
+name = "rust_ffi_example"
 version = "0.1.0"
 edition = "2021"
 
