@@ -3,8 +3,6 @@ cmake_minimum_required(VERSION 3.10)
 project(hello C)
 
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/out)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/out)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/out)
 
-add_library(add SHARED hello.c)
+add_library(add_dyn SHARED hello.c)
