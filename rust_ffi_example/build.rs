@@ -46,7 +46,7 @@ fn main() {
         );
 
         // 添加 库名字
-        println!("cargo:rustc-link-lib=dylib=add_dyn.dll");
+        println!("cargo:rustc-link-lib=dylib=add_dyn");
         println!("cargo:rustc-link-lib=static=add_static");
         println!("cargo:rustc-link-lib=dylib=minus_dyn.dll");
         println!("cargo:rustc-link-lib=static=minus_static");
