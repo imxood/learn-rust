@@ -1,4 +1,4 @@
-#[link(name = "hello")]
+#[link(name = "hello", kind = "dylib")]
 extern "C" {
     fn add(a: i32, b: i32) -> i32;
 }

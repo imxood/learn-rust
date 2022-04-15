@@ -4,6 +4,7 @@ fn main() {
     #[cfg(target_os = "windows")]
     {
         println!("cargo:rustc-link-search=native={}/c_library/build/Debug", path);
+        // println!("cargo:rustc-link-lib=dylib=hello");
     }
     
     #[cfg(target_os = "linux")]
