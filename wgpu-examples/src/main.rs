@@ -1,7 +1,7 @@
 mod texture;
 
 use std::iter;
-use wgpu::util::DeviceExt;
+use wgpu::{util::DeviceExt, SamplerBindingType};
 use winit::{
     event::*,
     event_loop::{ControlFlow, EventLoop},
@@ -136,14 +136,7 @@ impl State {
                     wgpu::BindGroupLayoutEntry {
                         binding: 1,
                         visibility: wgpu::ShaderStages::FRAGMENT,
-                        ty: wgpu::BindingType::Sampler {
-                            // This is only for TextureSampleType::Depth
-                            comparison: false,
-                            // This should be true if the sample_type of the texture is:
-                            //     TextureSampleType::Float { filterable: true }
-                            // Otherwise you'll get an error.
-                            filtering: true,
-                        },
+                        ty: wgpu::BindingType::Sampler(SamplerBindingType::Filtering),
                         count: None,
                     },
                 ],
@@ -205,7 +198,8 @@ impl State {
                 // Setting this to anything other than Fill requires Features::NON_FILL_POLYGON_MODE
                 polygon_mode: wgpu::PolygonMode::Fill,
                 // Requires Features::DEPTH_CLAMPING
-                clamp_depth: false,
+                // clamp_depth: false,
+                unclipped_depth: false,
                 // Requires Features::CONSERVATIVE_RASTERIZATION
                 conservative: false,
             },
@@ -215,6 +209,7 @@ impl State {
                 mask: !0,                         // 3.
                 alpha_to_coverage_enabled: false, // 4.
             },
+            multiview: None,
         });
 
         let vertex_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
